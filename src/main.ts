@@ -1,8 +1,8 @@
 import {DzrpSocketSerial} from './dzrpsocketserial';
 import {Log} from './log';
-import * as net from 'net';
 import * as tcpPortUsed from 'tcp-port-used';
-
+import * as SerialPort from 'serialport';
+import {resolve} from 'dns';
 
 class Startup {
 
@@ -132,7 +132,9 @@ cmdsocket -socket port -serial serial_if -baudrate rate [-log] [-test]
                         break;
 
                     case '-test':
+                        this.checkArguments();
                         await this.testSocket();
+                        await this.testSerial();
                         process.exit(0);
                         break;
                     
@@ -171,12 +173,11 @@ cmdsocket -socket port -serial serial_if -baudrate rate [-log] [-test]
 
 
     /**
-     * Tests to setup a socket and the serial interface.
+     * Tests to setup a socket.
      */
     protected static async testSocket(): Promise<void> {
-        this.checkArguments();
+        // Socket
         try {
-            this.socketPort=10000;
             const socketInUse=await tcpPortUsed.check(this.socketPort);
             if (socketInUse)
                 console.log("Socket is already in use. Choose another port.");
@@ -186,6 +187,39 @@ cmdsocket -socket port -serial serial_if -baudrate rate [-log] [-test]
         catch (e) {
             console.log("Socket error: "+e);
         }
+    }
+
+
+    /**
+     * Tests to setup a the serial interface.
+     */
+    protected static async testSerial(): Promise<void> {
+        // Serial interface
+        return new Promise<void>(resolve => {
+            try {
+                const serialPort=new SerialPort(this.serialPort, {
+                    baudRate: this.serialBaudrate, autoOpen: false
+                });
+                // React on-open
+                serialPort.on('open', async () => {
+                    console.log("Serial interface OK.");
+                    resolve();
+                });
+
+                // Handle errors
+                serialPort.on('error', err => {
+                    console.log('Error: ', err);
+                    resolve();
+                });
+
+                // Open the serial port
+                serialPort.open();
+            }
+            catch (e) {
+                console.log("Socket error: "+e);
+                resolve();
+            }
+        });
     }
 
 }

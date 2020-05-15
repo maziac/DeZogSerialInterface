@@ -1,0 +1,23 @@
+{
+	// Use IntelliSense to learn about possible attributes.
+	// Hover to view descriptions of existing attributes.
+	// For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+	"version": "0.2.0",
+	"configurations": [
+		{
+			"type": "node",
+			"request": "launch",
+			"name": "Launch",
+			"program": "${workspaceFolder}/out/main.js",
+			"args": [
+				"-socket", "12000",
+				"-serial", "/dev/cu.usbserial-14620",
+				"-baudrate", "230400"
+			],
+			"cwd": "${workspaceRoot}",
+			"runtimeArgs": ["-r", "ts-node/register"],
+			"console": "externalTerminal",
+			"internalConsoleOptions": "openOnSessionStart"
+		}
+	]
+}

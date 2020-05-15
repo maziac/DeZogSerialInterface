@@ -12,7 +12,8 @@
 			"args": [
 				"-socket", "12000",
 				"-serial", "/dev/cu.usbserial-14620",
-				"-baudrate", "230400"
+				"-baudrate", "230400",
+				"-test"
 			],
 			"cwd": "${workspaceRoot}",
 			"runtimeArgs": ["-r", "ts-node/register"],

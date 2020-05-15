@@ -1,5 +1,7 @@
 import {DzrpSocketSerial} from './dzrpsocketserial';
 import {Log} from './log';
+import * as net from 'net';
+import * as tcpPortUsed from 'tcp-port-used';
 
 
 class Startup {
@@ -18,14 +20,14 @@ class Startup {
      * The command line argument list is evaluated and the socket
      * is started.
      */
-    public static main(): number {
+    public static async main(): Promise<number> {
 
         try {
             // Get arguments
             const args = process.argv.splice(2);
 
             // Go through arguments
-            this.evaluateArgs(args);
+            await this.evaluateArgs(args);
 
             // Print parameters
             console.log('Using socket='+this.socketPort+', serial='+this.serialPort+', baudrate='+this.serialBaudrate);
@@ -58,7 +60,7 @@ $ cmdsocket -socket 12000
 Starts to listen on port 12000.
 
 General usage:
-cmdsocket -socket port -serial serial_if -baudrate rate [-log]
+cmdsocket -socket port -serial serial_if -baudrate rate [-log] [-test]
   options:
     -h|-help: Prints this help.
     -v|-version: Prints the version number.
@@ -66,6 +68,8 @@ cmdsocket -socket port -serial serial_if -baudrate rate [-log]
     -serial serial_if: The serial port, e.g. "/dev/usbserial" (Linux/macOS) or "COM1" (Windows).
     -baudrate rate: The baudrate to use for the serial port. Default=230400.
     -log: Enables logging to console.
+    -test: Use as last argument. If given the program tries to open a 
+    socket and a serial connection. Just to see if it could work.
 
 `);
     }
@@ -75,15 +79,15 @@ cmdsocket -socket port -serial serial_if -baudrate rate [-log]
      * Evaluates the command line arguments.
      * @param args List of arguments.
      */
-    protected static evaluateArgs(args: Array<string>) {
+    protected static async evaluateArgs(args: Array<string>): Promise<void> {
 
         // Iterate all arguments
         let arg;
-        const argCount = args.length;
-        while(arg = args.shift()) {
+        const argCount=args.length;
+        while (arg=args.shift()) {
 
             // Check option
-            if(arg.startsWith('-')) {
+            if (arg.startsWith('-')) {
                 switch (arg) {
                     // Help
                     case '-help':
@@ -127,8 +131,13 @@ cmdsocket -socket port -serial serial_if -baudrate rate [-log]
                         this.serialBaudrate=parseInt(baudrateString);
                         break;
 
+                    case '-test':
+                        await this.testSocket();
+                        process.exit(0);
+                        break;
+                    
                     default:
-                        throw "Unknown argument: '" + arg + "'";
+                        throw "Unknown argument: '"+arg+"'";
                 }
             }
             else {
@@ -138,9 +147,18 @@ cmdsocket -socket port -serial serial_if -baudrate rate [-log]
         }
 
         // Check if any argument given
-        if(argCount == 0)
+        if (argCount==0)
             throw "No arguments. Use 'dezogserialif -h' to show all options."
+        
+        this.checkArguments();
+    }
 
+
+    /**
+     * Checks if the arguments are given and throws an exception
+     * if not.
+     */
+    protected static checkArguments() {
         // Check arguments:
         if (!this.serialBaudrate)
             throw "No serial baudrate given.";
@@ -148,9 +166,33 @@ cmdsocket -socket port -serial serial_if -baudrate rate [-log]
             throw "No serial port given.";
         if (!this.socketPort)
             throw "No socket port given.";
+    }
 
-     }
+
+
+    /**
+     * Tests to setup a socket and the serial interface.
+     */
+    protected static async testSocket(): Promise<void> {
+        this.checkArguments();
+        try {
+            this.socketPort=10000;
+            const socketInUse=await tcpPortUsed.check(this.socketPort);
+            if (socketInUse)
+                console.log("Socket is already in use. Choose another port.");
+            else
+                console.log("Socket OK.");
+        }
+        catch (e) {
+            console.log("Socket error: "+e);
+        }
+    }
 
 }
+
+
+
+
+
 
 Startup.main();

@@ -47,7 +47,7 @@ export class DzrpSocketSerial {
 		this.socketPort=socketPort;
 		this.socketConnectionState=ConnectionState.CLOSED;
 
-		// Create Server
+		// Create server socket
 		this.server=net.createServer(socket => {
 			// Prohibit further incoming connections
 			this.server.close();
@@ -57,11 +57,15 @@ export class DzrpSocketSerial {
 			// Needs to be called manually (connect already happened before the handler was installed)
 			this.onConnect();
 		});
+		// Listen
+		this.server.listen(this.socketPort);
 
 		/*
 		The connection event sequence is:
 		'connect', 'end', 'closed'
 		*/
+
+
 	}
 
 

@@ -13,7 +13,7 @@
 				"-socket", "12000",
 				"-serial", "/dev/cu.usbserial-14620",
 				"-baudrate", "230400",
-				"-test"
+				//"-test"
 			],
 			"cwd": "${workspaceRoot}",
 			"runtimeArgs": ["-r", "ts-node/register"],

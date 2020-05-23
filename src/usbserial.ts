@@ -2,6 +2,7 @@ import * as SerialPort from 'serialport';
 //const {Transform}=require('stream');
 import * as Transform from 'stream';
 import {EventEmitter} from 'events';
+//import {WrapperParser} from './wrapperparser';
 
 //import {DzrpParser} from './dzrpparser';
 //import {LogSocket} from '../../log';
@@ -29,24 +30,30 @@ export class UsbSerial extends EventEmitter {
 	// The serial port.
 	protected serialPort;
 
+	// The baudrate to use for the serial port.
+	protected serialBaudrate: number;
+
 	// The read parser for the serial port.
 	//protected parser: DzrpParser;
 
 
 	/// Constructor.
-	//constructor() {
-	//}
+	constructor(port: string, baudrate: number) {
+		super();
+		this.serialPort=port;
+		this.serialBaudrate=baudrate;
+	}
 
 
 	/// Opens the serial port.
-	public async open(parser: Transform, port: string, baudrate: number): Promise<void> {
+	public async open(parser: Transform): Promise<void> {
 		// Just in case
 		if (this.serialPort&&this.serialPort.isOpen)
 			this.serialPort.close();
 
 		// Open the serial port
-		this.serialPort=new SerialPort(port /*"/dev/cu.usbserial-14610"*/, {
-			baudRate: baudrate /*115200*/, autoOpen: false
+		this.serialPort=new SerialPort(this.serialPort /*"/dev/cu.usbserial-14610"*/, {
+			baudRate: this.serialBaudrate /*115200*/, autoOpen: false
 		});
 
 		// Create parser
@@ -91,7 +98,7 @@ export class UsbSerial extends EventEmitter {
 	/**
 	 * Writes the buffer to the serial port.
 	 */
-	protected async sendBuffer(buffer: Buffer): Promise<void> {
+	public async sendBuffer(buffer: Buffer): Promise<void> {
 		// Send buffer
 		await this.serialPort.write(buffer);
 		// Start timer to wait on response

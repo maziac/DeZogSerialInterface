@@ -1,6 +1,8 @@
 import * as net from 'net';
 import * as assert  from 'assert';
 import {Log} from './log';
+import {UsbSerial} from './usbserial';
+import {WrapperParser} from './wrapperparser';
 
 
 
@@ -14,7 +16,9 @@ enum ConnectionState {  // TODO: not required
 
 
 /**
- * The Soxket / Serial Interface.
+ * The Socket / Serial Interface.
+ * If DeZog connects to the socket a new serial connection is setup.
+ * On disconnect the serial connection is closed.
  */
 export class DzrpSocketSerial {
 
@@ -31,10 +35,16 @@ export class DzrpSocketSerial {
 	protected socketConnectionState: ConnectionState;
 
 	/// The name of the serial port, e.g. "/dev/usbserial" or "COM1".
-	protected serialPort: string;
+	//protected serialPort: string;
 
 	/// The baudrate to use for the serial port.
-	protected serialBaudrate: number;
+	//protected serialBaudrate: number;
+	
+	// The USB serial instance.
+	protected usbSerial: UsbSerial;
+
+	// The read parser for the serial port.
+	protected serialParser: WrapperParser;
 
 	/**
 	 * Constructor.
@@ -42,11 +52,49 @@ export class DzrpSocketSerial {
 	 * @param serialPort The name of the serial port, e.g. "/dev/usbserial" or "COM1".
 	 * @param serialBaudrate The baudrate to use for the serial port, e.g. 230400.
 	 */
-	constructor(socketPort: number, serialPort: string, serialBaudrate: number) {
+	constructor(socketPort: number, serial: UsbSerial) {
 		// Store
 		this.socketPort=socketPort;
 		this.socketConnectionState=ConnectionState.CLOSED;
+		//this.serialPort=serialPort;
+		//this.serialBaudrate=serialBaudrate;
 
+		// Create serial read parser
+		this.serialParser=new WrapperParser({}, 'ZxNext Serial');
+		// Setup parser listener:
+		// Handle errors
+		this.serialParser.on('error', err => {
+			// Close socket connection
+			console.log("Serial error: "+err);
+			this.onClose();
+		});
+		// Install listener
+		this.serialParser.on('data', data => {
+			// Length was removed so add it again
+			const length=data.length;
+			const lengthBuffer=new Uint8Array([length&0xFF, (length>>>8)&0xFF, (length>>>16)&0xFF, (length>>>24)&0xFF]);
+			const buffer=Buffer.concat([lengthBuffer, data])
+			// Pass data to socket.
+			this.socket.write(buffer);
+		});
+
+		// Setup serial listeners
+		this.usbSerial=serial;
+		this.usbSerial.on('error', err => {
+			// Close socket connection
+			console.log("Serial error: "+err);
+			this.onClose();
+		});
+
+		// Start listening
+		this.listen();
+	}
+
+
+	/**
+	 * Listen for one connection.
+	 */
+	protected listen() {
 		// Create server socket
 		this.server=net.createServer(socket => {
 			// Prohibit further incoming connections
@@ -64,8 +112,6 @@ export class DzrpSocketSerial {
 		The connection event sequence is:
 		'connect', 'end', 'closed'
 		*/
-
-
 	}
 
 
@@ -133,7 +179,9 @@ export class DzrpSocketSerial {
 	 */
 	protected onConnect() {
 		Log.log('Socket connected.');
-		this.socketConnectionState == ConnectionState.CONNECTED;
+		this.socketConnectionState==ConnectionState.CONNECTED;
+		// Setup serial connection
+		this.usbSerial.open(this.serialParser as any);
 	}
 
 
@@ -142,7 +190,8 @@ export class DzrpSocketSerial {
 	 */
 	protected onClose() {
 		console.log('Socket disconnected.');
-		this.socketConnectionState == ConnectionState.CLOSED;
+		this.socketConnectionState==ConnectionState.CLOSED;
+		this.usbSerial.removeAllListeners();
 	}
 
 
@@ -151,11 +200,8 @@ export class DzrpSocketSerial {
 	 * Called if data has been received from the socket.
 	 */
 	protected onData(data) {
-		// Convert
-	//	let dataStr = data.toString();
-
-
-
+		// Simply pass on to serial
+		this.usbSerial.sendBuffer(data);
 	}
 
 }

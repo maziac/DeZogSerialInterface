@@ -1,8 +1,7 @@
 import {DzrpSocketSerial} from './dzrpsocketserial';
 import {Log} from './log';
-import * as tcpPortUsed from 'tcp-port-used';
-import * as SerialPort from 'serialport';
 import {UsbSerial} from './usbserial';
+import {InterfaceTests} from './interfacetests';
 
 
 
@@ -64,7 +63,7 @@ $ cmdsocket -socket 12000
 Starts to listen on port 12000.
 
 General usage:
-cmdsocket -socket port -serial serial_if -baudrate rate [-log] [-test]
+cmdsocket -socket port -serial serial_if -baudrate rate [-log] [-test] [-testserial time]
   options:
     -h|-help: Prints this help.
     -v|-version: Prints the version number.
@@ -75,8 +74,8 @@ cmdsocket -socket port -serial serial_if -baudrate rate [-log] [-test]
     -log: Enables logging to console.
     -test: Use as last argument. If given the program tries to open a 
      socket and a serial connection. Just to see if it could work.
-    -testserial: Test the serial connection. The remote side needs to loop back
-     all received data.
+    -testserial time batch-size: Test the serial connection. The remote side needs to loop back
+     all received data. time is in secs. batch-size determines teh size of the packets used.
 `);
     }
 
@@ -139,17 +138,24 @@ cmdsocket -socket port -serial serial_if -baudrate rate [-log] [-test]
                         break;
 
                     case '-testserial':
+                        const timeString=args.shift();
+                        if (timeString==undefined)
+                            throw "Missing time argument.";
+                        const time=parseInt(timeString);
+                        const batchSizeString=args.shift();
+                        if (batchSizeString==undefined)
+                            throw "Missing batch-size argument.";
+                        const batchSize=parseInt(batchSizeString);
                         this.checkSerialArguments();
-                        await this.testSocket();
-                        await this.testSerial();
+                        await InterfaceTests.testSerialLoopBack(this.serialPort, this.serialBaudrate, time, batchSize);
                         process.exit(0);
                         break;
                     
                     case '-test':
                         this.checkSocketArguments();
                         this.checkSerialArguments();
-                        await this.testSocket();
-                        await this.testSerial();
+                        await InterfaceTests.testSocket(this.socketPort);
+                        await InterfaceTests.testSerial(this.serialPort, this.serialBaudrate);
                         process.exit(0);
                         break;
                     
@@ -193,58 +199,6 @@ cmdsocket -socket port -serial serial_if -baudrate rate [-log] [-test]
         // Check arguments:
         if (!this.socketPort)
             throw "No socket port given.";
-    }
-
-
-
-    /**
-     * Tests to setup a socket.
-     */
-    protected static async testSocket(): Promise<void> {
-        // Socket
-        try {
-            const socketInUse=await tcpPortUsed.check(this.socketPort);
-            if (socketInUse)
-                console.log("Socket port "+this.socketPort+" is already in use. Choose another port.");
-            else
-                console.log("Socket port "+this.socketPort+" OK.");
-        }
-        catch (e) {
-            console.log("Socket error: "+e);
-        }
-    }
-
-
-    /**
-     * Tests to setup a the serial interface.
-     */
-    protected static async testSerial(): Promise<void> {
-        // Serial interface
-        return new Promise<void>(resolve => {
-            try {
-                const serialPort=new SerialPort(this.serialPort, {
-                    baudRate: this.serialBaudrate, autoOpen: false
-                });
-                // React on-open
-                serialPort.on('open', async () => {
-                    console.log("Serial interface "+this.serialPort+" @"+this.serialBaudrate+" baud OK.");
-                    resolve();
-                });
-
-                // Handle errors
-                serialPort.on('error', err => {
-                    console.log("Serial interface "+this.serialPort+" @"+this.serialBaudrate+"baud Error: ", err);
-                    resolve();
-                });
-
-                // Open the serial port
-                serialPort.open();
-            }
-            catch (e) {
-                console.log("Serial interface "+this.serialPort+" @"+this.serialBaudrate+"baud Error: "+e);
-                resolve();
-            }
-        });
     }
 
 }

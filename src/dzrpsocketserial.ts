@@ -68,7 +68,7 @@ export class DzrpSocketSerial {
 			console.log("Serial error: "+err);
 			this.onClose();
 		});
-		// Install listener
+		// Install data handler
 		this.serialParser.on('data', data => {
 			// Length was removed so add it again
 			const length=data.length;

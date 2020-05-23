@@ -81,7 +81,7 @@ export class WrapperParser extends Transform {
 	 */
 	_transform(chunk, encoding, cb) {
 		// Stop timer
-		console.log(this.name, "0 clear timer, remainingLength=", this.remainingLength, "chunk=", chunk.length, ", buffer=", this.buffer.length, chunk);
+		//console.log(this.name, "0 clear timer, remainingLength=", this.remainingLength, "chunk=", chunk.length, ", buffer=", this.buffer.length, chunk);
 		clearTimeout(this.timer);
 		this.timer=undefined;
 		// Concat data
@@ -94,9 +94,9 @@ export class WrapperParser extends Transform {
 					break;
 				const data=this.buffer;
 				this.remainingLength=data[0]+(data[1]<<8)+(data[2]<<16)+(data[3]*256*65536);	// Note: <<24 might return a negative value
-				console.log(this.name, "0b new message, (remaining)Length=", this.remainingLength);
+				//console.log(this.name, "0b new message, (remaining)Length=", this.remainingLength);
 				if (this.remainingLength>100||this.remainingLength<0) {
-					console.log("err");
+					//console.log("err");
 				}
 				this.buffer=this.buffer.subarray(4);
 				this.collectingData=true;
@@ -116,20 +116,20 @@ export class WrapperParser extends Transform {
 				data=data.subarray(0, this.remainingLength);
 			}
 			// Enough data collected
-			console.log(this.name, "1 push, remainingLength=", this.remainingLength, ", buffer=", this.buffer.length);
+			//console.log(this.name, "1 push, remainingLength=", this.remainingLength, ", buffer=", this.buffer.length);
 			this.push(data);
-			console.log(this.name, "2a remainingLength=", this.remainingLength, ", buffer=", this.buffer.length);
+			//console.log(this.name, "2a remainingLength=", this.remainingLength, ", buffer=", this.buffer.length);
 			this.buffer=this.buffer.subarray(this.remainingLength);	// Normally clears the buffer
 			this.remainingLength=this.buffer.length;
-			console.log(this.name, "2b remainingLength=", this.remainingLength, ", buffer=", this.buffer.length);
+			//console.log(this.name, "2b remainingLength=", this.remainingLength, ", buffer=", this.buffer.length);
 		}
 		// Start timeout
 		if (this.remainingLength>0) {
 			this.startTimer('Too much time between two data chunks.');
-			console.log(this.name, "3a set timer");
+			//console.log(this.name, "3a set timer");
 		}
 		// Call callback
-		console.log(this.name, "3b return, remainingLength=", this.remainingLength, ", buffer=", this.buffer.length);
+		//console.log(this.name, "3b return, remainingLength=", this.remainingLength, ", buffer=", this.buffer.length);
 		cb();
 	}
 

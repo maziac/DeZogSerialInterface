@@ -82,19 +82,15 @@ export class InterfaceTests {
                 // React on-open
 				serialPort.on('open', async () => {
 					//state="open";
-					console.log("Serial interface "+serialPortString+" @"+serialBaudrate+" baud.");
-					clearTimeout(timeout);
-					timeout=setTimeout(() => {
-						throw "Timeout. No initial data received.";
-					}, 10*1000);
+					console.log("Serial interface '"+serialPortString+"' @"+serialBaudrate+" baud.");
 					setTimeout(() => {
 						// When elapsed testing can be stopped.
 						console.log("Bytes sent: "+bytesSent);
 						console.log("Bytes received: "+bytesReceived);
-						console.log("Bytes/ms: "+(bytesSent+bytesReceived)/time/1000);
+						console.log("Bytes/ms: "+(bytesReceived)/time/1000);
 						console.log("Packets sent: "+packetsSent);
 						console.log("Packets received: "+packetsReceived);
-						console.log("Packets/ms: "+(packetsSent+packetsReceived)/time/1000);
+						console.log("Packets/ms: "+(packetsReceived)/time/1000);
 						console.log("Sucessful. No error.");
 						clearTimeout(timeout);
 						serialPort.close();
@@ -106,7 +102,8 @@ export class InterfaceTests {
 
                 // Handle errors
                 serialPort.on('error', err => {
-					throw "Serial interface "+serialPortString+" @"+serialBaudrate+"baud Error: "+err;
+					console.log("Serial interface '"+serialPortString+"' @"+serialBaudrate+" baud\nError: "+err);
+					resolve();
                 });
 
 				// Install data handler
@@ -114,14 +111,17 @@ export class InterfaceTests {
 				parser.on('data', data => {
 					clearTimeout(timeout);
 					timeout=setTimeout(() => {
-						throw "Timeout. No data received.";
-					}, 10*1000);
+						console.log("Timeout. No data received.");
+						resolve();
+					}, 1000);
 					// Length was removed.
 					// Check data.
 					for (const byte of data) {
 						lastByteReceived=(lastByteReceived+1)&0xFF;
-						if (byte!=lastByteReceived)
-							throw "Wrong data received.";
+						if (byte!=lastByteReceived) {
+							console.log("Wrong data received.");
+							resolve();
+						}
 					}
 					bytesReceived+=data.length;
 					batchReceived+=data.length;
@@ -147,8 +147,9 @@ export class InterfaceTests {
 
                 // Open the serial port
 				timeout=setTimeout(() => {
-					throw "Timeout. No connection.";
-				}, 10*1000);
+					console.log("Timeout. No connection.");
+					resolve();
+					}, 1000);
 				serialPort.pipe(parser);
 				serialPort.open();
             }
@@ -158,10 +159,10 @@ export class InterfaceTests {
 				// When elapsed testing can be stopped.
 				console.log("Bytes sent: "+bytesSent);
 				console.log("Bytes received: "+bytesReceived);
-				console.log("Bytes/ms: "+(bytesSent+bytesReceived)/time/1000);
+				console.log("Bytes/ms: "+(bytesReceived)/time/1000);
 				console.log("Packets sent: "+packetsSent);
 				console.log("Packets received: "+packetsReceived);
-				console.log("Packets/ms: "+(packetsSent+packetsReceived)/time/1000);
+				console.log("Packets/ms: "+(packetsReceived)/time/1000);
 				clearTimeout(timeout);
 				if(serialPort)
 					serialPort.close();

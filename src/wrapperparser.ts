@@ -80,6 +80,7 @@ export class WrapperParser extends Transform {
 	 *  Read chunks of data until a complete message has been received.
 	 */
 	_transform(chunk, encoding, cb) {
+		//console.log("Length="+chunk.length);
 		// Stop timer
 		//console.log(this.name, "0 clear timer, remainingLength=", this.remainingLength, "chunk=", chunk.length, ", buffer=", this.buffer.length, chunk);
 		clearTimeout(this.timer);

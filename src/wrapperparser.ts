@@ -75,10 +75,20 @@ export class WrapperParser extends Transform {
 	}
 
 
-// TODO: Remove all logs below!
+	/**
+	 * Just pass the data on. 
+	 * The chunks received here are typically not bigger than 50-130 bytes.
+	 */
+	_transform(chunk, encoding, cb) {
+		this.push(chunk);
+		cb();
+	}
+
 	/**
 	 *  Read chunks of data until a complete message has been received.
 	 */
+
+/*
 	_transform(chunk, encoding, cb) {
 		//console.log("Length="+chunk.length);
 		// Stop timer
@@ -140,5 +150,6 @@ export class WrapperParser extends Transform {
 		this.buffer=Buffer.alloc(0)
 		cb()
 	}
+*/
 }
 

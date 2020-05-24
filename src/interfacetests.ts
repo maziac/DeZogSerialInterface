@@ -118,9 +118,10 @@ export class InterfaceTests {
 					// Check data.
 					for (const byte of data) {
 						lastByteReceived=(lastByteReceived+1)&0xFF;
-						if (byte!=lastByteReceived) {
-							console.log("Wrong data received.");
+						if (false && byte!=lastByteReceived) {
+							console.log("Wrong data received after "+bytesReceived+" received bytes");
 							resolve();
+							return;
 						}
 					}
 					bytesReceived+=data.length;
@@ -129,15 +130,10 @@ export class InterfaceTests {
 						batchReceived-=batchSize;
 						packetsReceived++;
 						// Send next data
-						const buffer=new Uint8Array(batchSize+4);
-						// Send data in packets with length header.
-						buffer[0]=batchSize&0xFF;
-						buffer[1]=(batchSize>>>8)&0xFF;
-						buffer[2]=(batchSize>>>16)&0xFF;
-						buffer[3]=(batchSize>>>24)&0xFF;
+						const buffer=new Uint8Array(batchSize);
 						for (let i=0; i<batchSize; i++) {
 							lastByteSent=(lastByteSent+1)&0xFF;
-							buffer[i+4]=lastByteSent;
+							buffer[i]=lastByteSent;
 						}
 						bytesSent+=batchSize;
 						packetsSent++;

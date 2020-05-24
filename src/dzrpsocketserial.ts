@@ -20,7 +20,7 @@ enum ConnectionState {  // TODO: not required
  * If DeZog connects to the socket a new serial connection is setup.
  * On disconnect the serial connection is closed.
  */
-export class DzrpSocketSerial {
+export class DzrpSocketSerial { // TODO: Rename. DZRP agnostic.
 
 	/// The used socket.
 	protected socket: net.Socket;
@@ -48,7 +48,7 @@ export class DzrpSocketSerial {
 
 	/**
 	 * Constructor.
-	 * @param socketPort The port forthe socket, e.g. 12000
+	 * @param socketPort The port for the socket, e.g. 12000
 	 * @param serialPort The name of the serial port, e.g. "/dev/usbserial" or "COM1".
 	 * @param serialBaudrate The baudrate to use for the serial port, e.g. 230400.
 	 */
@@ -70,12 +70,8 @@ export class DzrpSocketSerial {
 		});
 		// Install data handler
 		this.serialParser.on('data', data => {
-			// Length was removed so add it again
-			const length=data.length;
-			const lengthBuffer=new Uint8Array([length&0xFF, (length>>>8)&0xFF, (length>>>16)&0xFF, (length>>>24)&0xFF]);
-			const buffer=Buffer.concat([lengthBuffer, data])
-			// Pass data to socket.
-			this.socket.write(buffer);
+			// Just pass data to the socket.
+			this.socket.write(data);
 		});
 
 		// Setup serial listeners

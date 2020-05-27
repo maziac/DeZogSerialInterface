@@ -116,9 +116,9 @@ export class InterfaceTests {
 					}, 1000);
 					// Length was removed.
 					// Check data.
-					for (const byte of data) {
+					for (const recByte of data) {
 						lastByteReceived=(lastByteReceived+1)&0xFF;
-						if (false && byte!=lastByteReceived) {
+						if (recByte!=lastByteReceived) {
 							console.log("Wrong data received after "+bytesReceived+" received bytes");
 							resolve();
 							return;

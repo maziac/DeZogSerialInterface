@@ -47,35 +47,72 @@ export class UsbSerial extends EventEmitter {
 
 	/// Opens the serial port.
 	public async open(parser: Transform): Promise<void> {
-		// Just in case
-		if (this.serialPort&&this.serialPort.isOpen)
-			this.serialPort.close();
+		return new Promise<void>((resolve, reject) => {
+			// Just in case
+			if (this.serialPort&&this.serialPort.isOpen)
+				this.serialPort.close();
 
-		// Open the serial port
-		this.serialPort=new SerialPort(this.serialPort /*"/dev/cu.usbserial-14610"*/, {
-			baudRate: this.serialBaudrate /*115200*/, autoOpen: false
+			// Open the serial port
+			this.serialPort=new SerialPort(this.serialPort /*"/dev/cu.usbserial-14610"*/, {
+				baudRate: this.serialBaudrate /*115200*/, autoOpen: false
+			});
+
+			// Create parser
+			//this.parser=
+			this.serialPort.pipe(parser);  //new DzrpParser({}, 'Serial'));
+
+			// React on-open
+			this.serialPort.once('open', async () => {
+				console.log('USB-Serial connection opened!');
+				// Drain data on connection
+				let drainTimeOut;
+				parser.on('data', data => {
+					// After opening first 'drain' the connection
+					clearTimeout(drainTimeOut);
+					drainTimeOut=setTimeout(() => {
+						// On timeout the connection is drained.
+						drainTimeOut=undefined;
+						parser.removeAllListeners('data');
+						this.serialPort.removeAllListeners('error');
+						// Setup new listeners
+						// Handle errors
+						this.serialPort.on('error', err => {
+							console.log('Error: ', err);
+							// Error
+							this.emit('error', err);
+						});
+						// Handle parser errors
+						parser.on('error', err => {
+							console.log('Error: ', err);
+							// Error
+							this.emit('error', err);
+						});
+
+						// Now start real data receiving
+						clearTimeout(drainTimeOut);
+						parser.on('data', data => {
+							// Just pass data
+							this.emit('data', data);
+						});
+						resolve();
+					}, 100);
+				});
+
+				// Start draining
+				this.emit('draining');
+				parser.emit('data');
+			});
+
+			// Handle errors
+			this.serialPort.once('error', err => {
+				console.log('Error: ', err);
+				// Error
+				reject(err);
+			});
+
+			// Open the serial port
+			this.serialPort.open();
 		});
-
-		// Create parser
-		//this.parser=
-		this.serialPort.pipe(parser);  //new DzrpParser({}, 'Serial'));
-
-
-		// React on-open
-		this.serialPort.on('open', async () => {
-			console.log('USB-Serial connection opened!');
-			this.emit('open');
-		});
-
-		// Handle errors
-		this.serialPort.on('error', err => {
-			console.log('Error: ', err);
-			// Error
-			this.emit('error', err);
-		});
-
-		// Open the serial port
-		this.serialPort.open();
 	}
 
 

@@ -10,10 +10,10 @@
 			"name": "Launch",
 			"program": "${workspaceFolder}/out/main.js",
 			"args": [
-				"-socket", "12000",
-				"-serial", "/dev/cu.usbserial-14620",
-				"-baudrate", "230400",
-				"-testserial", "5", "100"
+				//"-socket", "12000",
+				//"-serial", "/dev/cu.usbserial-14620",
+				"-baudrate", "921600",
+				"-testserial", "2", "1000"
 				//"-test"
 			],
 			"cwd": "${workspaceRoot}",

@@ -1,6 +1,7 @@
 import * as tcpPortUsed from 'tcp-port-used';
 import * as SerialPort from 'serialport';
 import {WrapperParser} from './wrapperparser';
+import {UsbSerial} from './usbserial';
 
 
 
@@ -74,41 +75,22 @@ export class InterfaceTests {
 		//let state="started";
 
         // Serial interface
-        return new Promise<void>(resolve => {
-            try {
-				serialPort=new SerialPort(serialPortString, {
-                    baudRate: serialBaudrate, autoOpen: false
-                });
-                // React on-open
-				serialPort.on('open', async () => {
-					//state="open";
-					console.log("Serial interface '"+serialPortString+"' @"+serialBaudrate+" baud.");
-					setTimeout(() => {
-						// When elapsed testing can be stopped.
-						console.log("Bytes sent: "+bytesSent);
-						console.log("Bytes received: "+bytesReceived);
-						console.log("Bytes/ms: "+(bytesReceived)/time/1000);
-						console.log("Packets sent: "+packetsSent);
-						console.log("Packets received: "+packetsReceived);
-						console.log("Packets/ms: "+(packetsReceived)/time/1000);
-						console.log("Sucessful. No error.");
-						clearTimeout(timeout);
-						serialPort.close();
-						resolve();
-					}, time*1000);
-					// Send first batch
-					parser.emit('data', []);
-               });
-
-                // Handle errors
-                serialPort.on('error', err => {
+        return new Promise<void>(async resolve => {
+			try {
+				serialPort=new UsbSerial(serialPortString, serialBaudrate);
+				// Print draining
+				serialPort.on('draining', async () => {
+					// The port is drained before the open event arrives
+					console.log("Draining.");
+				});
+				// Handle errors
+				serialPort.on('error', err => {
 					console.log("Serial interface '"+serialPortString+"' @"+serialBaudrate+" baud\nError: "+err);
 					resolve();
-                });
+				});
 
 				// Install data handler
-				const parser=new WrapperParser({}, 'ZxNext Serial')
-				parser.on('data', data => {
+				serialPort.on('data', data => {
 					clearTimeout(timeout);
 					timeout=setTimeout(() => {
 						console.log("Timeout. No data received.");
@@ -137,18 +119,39 @@ export class InterfaceTests {
 						}
 						bytesSent+=batchSize;
 						packetsSent++;
-						serialPort.write(buffer);
+						serialPort.sendBuffer(buffer);
 					}
 				});
 
-                // Open the serial port
+				// Open the serial port
 				timeout=setTimeout(() => {
 					console.log("Timeout. No connection.");
 					resolve();
-					}, 1000);
-				serialPort.pipe(parser);
-				serialPort.open();
-            }
+				}, 1000);
+
+				// Open
+				const parser=new WrapperParser({}, 'ZxNext Serial')
+				await serialPort.open(parser);
+				
+				// Success
+				console.log("Serial interface '"+serialPortString+"' @"+serialBaudrate+" baud.");
+				setTimeout(() => {
+					// When elapsed testing can be stopped.
+					console.log("Bytes sent: "+bytesSent);
+					console.log("Bytes received: "+bytesReceived);
+					console.log("Bytes/ms: "+(bytesReceived)/time/1000);
+					console.log("Packets sent: "+packetsSent);
+					console.log("Packets received: "+packetsReceived);
+					console.log("Packets/s: "+(packetsReceived)/time);
+					console.log("Sucessful. No error.");
+					clearTimeout(timeout);
+					serialPort.close();
+					resolve();
+				}, time*1000);
+
+				// Send first batch
+				serialPort.emit('data', []);
+			}
 			catch (e) {
 				clearTimeout(timeout);
 				console.log("Serial interface "+serialPortString+" @"+serialBaudrate+"baud Error: "+e);
@@ -158,7 +161,7 @@ export class InterfaceTests {
 				console.log("Bytes/ms: "+(bytesReceived)/time/1000);
 				console.log("Packets sent: "+packetsSent);
 				console.log("Packets received: "+packetsReceived);
-				console.log("Packets/ms: "+(packetsReceived)/time/1000);
+				console.log("Packets/s: "+(packetsReceived)/time);
 				clearTimeout(timeout);
 				if(serialPort)
 					serialPort.close();

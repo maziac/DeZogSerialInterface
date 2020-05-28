@@ -61,18 +61,6 @@ export class DzrpSocketSerial { // TODO: Rename. DZRP agnostic.
 
 		// Create serial read parser
 		this.serialParser=new WrapperParser({}, 'ZxNext Serial');
-		// Setup parser listener:
-		// Handle errors
-		this.serialParser.on('error', err => {
-			// Close socket connection
-			console.log("Serial error: "+err);
-			this.onClose();
-		});
-		// Install data handler
-		this.serialParser.on('data', data => {
-			// Just pass data to the socket.
-			this.socket.write(data);
-		});
 
 		// Setup serial listeners
 		this.usbSerial=serial;
@@ -80,6 +68,11 @@ export class DzrpSocketSerial { // TODO: Rename. DZRP agnostic.
 			// Close socket connection
 			console.log("Serial error: "+err);
 			this.onClose();
+		});
+		// Install data handler
+		this.usbSerial.on('data', data => {
+			// Just pass data to the socket.
+			this.socket.write(data);
 		});
 
 		// Start listening

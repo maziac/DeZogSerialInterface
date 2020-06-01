@@ -14,7 +14,7 @@ class Startup {
     protected static serialPort: string= '/dev/cu.usbserial-14620';
 
     /// The baudrate to use for the serial port.
-    protected static serialBaudrate: number = 230400;
+    protected static serialBaudrate: number = 921600;
 
     /**
      * The main program. This is the start point.

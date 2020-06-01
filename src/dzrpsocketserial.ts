@@ -6,14 +6,6 @@ import {WrapperParser} from './wrapperparser';
 
 
 
-/// Connection state.
-enum ConnectionState {  // TODO: not required
-	CLOSED = 0,
-	CONNECTING,
-	CONNECTED
-};
-
-
 
 /**
  * The Socket / Serial Interface.
@@ -30,9 +22,6 @@ export class DzrpSocketSerial { // TODO: Rename. DZRP agnostic.
 
 	/// The port of the socket.
 	protected socketPort: number;
-
-	/// The state of the socket connection.
-	protected socketConnectionState: ConnectionState;
 
 	/// The name of the serial port, e.g. "/dev/usbserial" or "COM1".
 	//protected serialPort: string;
@@ -55,7 +44,6 @@ export class DzrpSocketSerial { // TODO: Rename. DZRP agnostic.
 	constructor(socketPort: number, serial: UsbSerial) {
 		// Store
 		this.socketPort=socketPort;
-		this.socketConnectionState=ConnectionState.CLOSED;
 		//this.serialPort=serialPort;
 		//this.serialBaudrate=serialBaudrate;
 
@@ -141,10 +129,11 @@ export class DzrpSocketSerial { // TODO: Rename. DZRP agnostic.
 	/**
 	 * @returns true if the csocket is connected.
 	 */
+	/*
 	public isClosed() {
 		return this.socketConnectionState == ConnectionState.CLOSED;
 	}
-
+	*/
 
 	/**
 	 * Closes the socket connection.
@@ -168,7 +157,6 @@ export class DzrpSocketSerial { // TODO: Rename. DZRP agnostic.
 	 */
 	protected onConnect() {
 		Log.log('Socket connected.');
-		this.socketConnectionState==ConnectionState.CONNECTED;
 		// Setup serial connection
 		this.usbSerial.open(this.serialParser as any);
 	}
@@ -179,7 +167,6 @@ export class DzrpSocketSerial { // TODO: Rename. DZRP agnostic.
 	 */
 	protected onClose() {
 		console.log('Socket disconnected.');
-		this.socketConnectionState==ConnectionState.CLOSED;
 		this.usbSerial.removeAllListeners();
 	}
 

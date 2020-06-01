@@ -1,4 +1,4 @@
-import {DzrpSocketSerial} from './dzrpsocketserial';
+import {SocketSerialPassthrough} from './socketserialpassthrough';
 import {Log} from './log';
 import {UsbSerial} from './usbserial';
 import {InterfaceTests} from './interfacetests';
@@ -37,7 +37,7 @@ class Startup {
             const serial=new UsbSerial(this.serialPort, this.serialBaudrate);
             // Start dzrp socket
             //const socket=
-            new DzrpSocketSerial(this.socketPort, serial);
+            new SocketSerialPassthrough(this.socketPort, serial);
         }
         catch(e) {
             // Output any problems

@@ -11,8 +11,10 @@ import {WrapperParser} from './wrapperparser';
  * The Socket / Serial Interface.
  * If DeZog connects to the socket a new serial connection is setup.
  * On disconnect the serial connection is closed.
+ * This class is not aware of DZRP it just passes everything received on
+ * either side to the other side.
  */
-export class DzrpSocketSerial { // TODO: Rename. DZRP agnostic.
+export class SocketSerialPassthrough {
 
 	/// The used socket.
 	protected socket: net.Socket;

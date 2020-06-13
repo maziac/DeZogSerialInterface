@@ -36,12 +36,15 @@ export class UsbSerial extends EventEmitter {
 	// The read parser for the serial port.
 	//protected parser: DzrpParser;
 
+	// Caches the first message that might be send before the receive buffer is drained.
+	protected tmpSendBuffer: Array<Buffer>;
 
 	/// Constructor.
 	constructor(port: string, baudrate: number) {
 		super();
 		this.serialPort=port;
 		this.serialBaudrate=baudrate;
+		this.tmpSendBuffer = new Array<Buffer>();
 	}
 
 
@@ -94,6 +97,11 @@ export class UsbSerial extends EventEmitter {
 							// Just pass data
 							this.emit('data', data);
 						});
+						// Send cached buffer
+						const sendCache=this.tmpSendBuffer;
+						this.tmpSendBuffer=undefined as any;
+						for (const buffer of sendCache)
+							this.sendBuffer(buffer);
 						resolve();
 					}, 100);
 				});
@@ -136,10 +144,14 @@ export class UsbSerial extends EventEmitter {
 	 * Writes the buffer to the serial port.
 	 */
 	public async sendBuffer(buffer: Buffer): Promise<void> {
-		// Send buffer
-		await this.serialPort.write(buffer);
-		// Start timer to wait on response
-		//this.parser.startTimer('Remote side did not respond.');
+		if (this.tmpSendBuffer) {
+			// Cache until drainign is over
+			this.tmpSendBuffer.push(buffer);
+		}
+		else {
+			// Send buffer directly
+			await this.serialPort.write(buffer);
+		}
 	}
 }
 

@@ -61,6 +61,7 @@ export class SocketSerialPassthrough {
 		});
 		// Install data handler
 		this.usbSerial.on('data', data => {
+			console.log("Received data from serial.");
 			// Just pass data to the socket.
 			this.socket.write(data);
 		});
@@ -158,7 +159,7 @@ export class SocketSerialPassthrough {
 	 * Called if the socket is connected.
 	 */
 	protected onConnect() {
-		Log.log('Socket connected.');
+		console.log('Socket connected.');
 		// Setup serial connection
 		this.usbSerial.open(this.serialParser as any);
 	}
@@ -180,6 +181,7 @@ export class SocketSerialPassthrough {
 	protected onData(data) {
 		// Simply pass on to serial
 		this.usbSerial.sendBuffer(data);
+		console.log("Sent data to serial.");
 	}
 
 }

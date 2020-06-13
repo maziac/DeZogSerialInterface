@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.3.0
+Reconnects now after disconnect.
+
 ## 0.2.0
 Changed parser to ignore the length and just pass received bytes.
 

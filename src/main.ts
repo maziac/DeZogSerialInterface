@@ -33,10 +33,22 @@ class Startup {
             // Print parameters
             console.log('Using socket='+this.socketPort+', serial='+this.serialPort+', baudrate='+this.serialBaudrate);
 
-            // Create Serial object
-            const serial=new UsbSerial(this.serialPort, this.serialBaudrate);
-            // Start socket
-            new SocketSerialPassthrough(this.socketPort, serial);
+            const create=() => {
+                // Create Serial object
+                const serial=new UsbSerial(this.serialPort, this.serialBaudrate);
+                // Start socket
+                const socket=new SocketSerialPassthrough(this.socketPort, serial);
+                // Reconnect
+                socket.on('disconnect', () => {
+                    setTimeout(() => {
+                        create();
+                    }, 1000);
+                });
+            }
+
+            // Connect first time
+            create();
+
         }
         catch(e) {
             // Output any problems

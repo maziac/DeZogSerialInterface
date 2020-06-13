@@ -3,6 +3,7 @@ import * as assert  from 'assert';
 import {Log} from './log';
 import {UsbSerial} from './usbserial';
 import {WrapperParser} from './wrapperparser';
+import {EventEmitter} from 'events';
 
 
 
@@ -14,7 +15,7 @@ import {WrapperParser} from './wrapperparser';
  * This class is not aware of DZRP it just passes everything received on
  * either side to the other side.
  */
-export class SocketSerialPassthrough {
+export class SocketSerialPassthrough extends EventEmitter {
 
 	/// The used socket.
 	protected socket: net.Socket;
@@ -37,6 +38,7 @@ export class SocketSerialPassthrough {
 	// The read parser for the serial port.
 	protected serialParser: WrapperParser;
 
+
 	/**
 	 * Constructor.
 	 * @param socketPort The port for the socket, e.g. 12000
@@ -44,6 +46,7 @@ export class SocketSerialPassthrough {
 	 * @param serialBaudrate The baudrate to use for the serial port, e.g. 230400.
 	 */
 	constructor(socketPort: number, serial: UsbSerial) {
+		super();
 		// Store
 		this.socketPort=socketPort;
 		//this.serialPort=serialPort;
@@ -87,6 +90,8 @@ export class SocketSerialPassthrough {
 		});
 		// Listen
 		this.server.listen(this.socketPort);
+		// Output
+		console.log("Waiting for connection on port "+this.socketPort);
 
 		/*
 		The connection event sequence is:
@@ -130,7 +135,7 @@ export class SocketSerialPassthrough {
 
 
 	/**
-	 * @returns true if the csocket is connected.
+	 * @returns true if the socket is connected.
 	 */
 	/*
 	public isClosed() {
@@ -171,6 +176,10 @@ export class SocketSerialPassthrough {
 	protected onClose() {
 		console.log('Socket disconnected.');
 		this.usbSerial.removeAllListeners();
+		this.usbSerial.close();
+		this.socket.removeAllListeners();
+		this.socket=undefined as any;
+		this.emit('disconnect');		
 	}
 
 

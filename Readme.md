@@ -1,4 +1,4 @@
 # DeZog Serial interface
 
-A serial interface to connect DeZog with a ZX Next.
+A socket-serial interface to connect DeZog with a ZX Next.
 

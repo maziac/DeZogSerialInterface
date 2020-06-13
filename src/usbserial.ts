@@ -1,15 +1,7 @@
 import * as SerialPort from 'serialport';
-//const {Transform}=require('stream');
 import * as Transform from 'stream';
 import {EventEmitter} from 'events';
-//import {WrapperParser} from './wrapperparser';
 
-//import {DzrpParser} from './dzrpparser';
-//import {LogSocket} from '../../log';
-//import {ZxNextRemote} from './zxnextremote';
-
-
-//let sSerialPort;
 
 /*
  Install serialport:
@@ -32,9 +24,6 @@ export class UsbSerial extends EventEmitter {
 
 	// The baudrate to use for the serial port.
 	protected serialBaudrate: number;
-
-	// The read parser for the serial port.
-	//protected parser: DzrpParser;
 
 	// Caches the first message that might be send before the receive buffer is drained.
 	protected tmpSendBuffer: Array<Buffer>;
@@ -61,8 +50,7 @@ export class UsbSerial extends EventEmitter {
 			});
 
 			// Create parser
-			//this.parser=
-			this.serialPort.pipe(parser);  //new DzrpParser({}, 'Serial'));
+			this.serialPort.pipe(parser); 
 
 			// React on-open
 			this.serialPort.once('open', async () => {

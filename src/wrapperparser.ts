@@ -11,7 +11,7 @@ const {Transform}=require('stream');
  * The only required format is:
  *  4 bytes length
  *  payload (of length)
- * This could be DZRP, DZRPN or any other format.
+ * This could be DZRP or any other format.
  */
 export class WrapperParser extends Transform {
 	/// State: Either waiting for length (false) or collecting data (true).
@@ -54,7 +54,7 @@ export class WrapperParser extends Transform {
 	 * I.e. Adds name and some constant text to it.
 	 */
 	public ErrorWithText(text: string): Error {
-		let wholeText="DZRP";
+		let wholeText="Socket";
 		if (this.name)
 			wholeText+=" ("+this.name+")";
 		wholeText+=": "+text;

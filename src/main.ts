@@ -35,8 +35,7 @@ class Startup {
 
             // Create Serial object
             const serial=new UsbSerial(this.serialPort, this.serialBaudrate);
-            // Start dzrp socket
-            //const socket=
+            // Start socket
             new SocketSerialPassthrough(this.socketPort, serial);
         }
         catch(e) {

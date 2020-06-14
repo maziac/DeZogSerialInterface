@@ -5,13 +5,9 @@ const {Transform}=require('stream');
 
 
 /**
- * This parser reads the first 4 bytes and interprets it as (little endian) length.
- * Then it collects 'length' further bytes.
- * When all bytes have been received the data is emitted.
- * The only required format is:
- *  4 bytes length
- *  payload (of length)
- * This could be DZRP or any other format.
+ * This parser does not really parse.
+ * It just reads what comes in and passes it through.
+ * No CZRP handling.
  */
 export class WrapperParser extends Transform {
 	/// State: Either waiting for length (false) or collecting data (true).
@@ -83,73 +79,5 @@ export class WrapperParser extends Transform {
 		this.push(chunk);
 		cb();
 	}
-
-	/**
-	 *  Read chunks of data until a complete message has been received.
-	 */
-
-/*
-	_transform(chunk, encoding, cb) {
-		//console.log("Length="+chunk.length);
-		// Stop timer
-		//console.log(this.name, "0 clear timer, remainingLength=", this.remainingLength, "chunk=", chunk.length, ", buffer=", this.buffer.length, chunk);
-		clearTimeout(this.timer);
-		this.timer=undefined;
-		// Concat data
-		this.buffer=Buffer.concat([this.buffer, chunk])
-		while (true) {
-			// Check state
-			if (!this.collectingData) {
-				// Check if all 4 bytes have been received
-				if (this.buffer.length<4)
-					break;
-				const data=this.buffer;
-				this.remainingLength=data[0]+(data[1]<<8)+(data[2]<<16)+(data[3]*256*65536);	// Note: <<24 might return a negative value
-				//console.log(this.name, "0b new message, (remaining)Length=", this.remainingLength);
-				if (this.remainingLength>100||this.remainingLength<0) {
-					//console.log("err");
-				}
-				this.buffer=this.buffer.subarray(4);
-				this.collectingData=true;
-			}
-
-			// Collect until all remaining bytes received
-			const count=this.buffer.length;
-			if (count<this.remainingLength)
-				break;
-
-			// Enough data
-			this.collectingData=false;
-
-			// Check if there was too many data received
-			let data=this.buffer;
-			if (count>this.remainingLength) {
-				data=data.subarray(0, this.remainingLength);
-			}
-			// Enough data collected
-			//console.log(this.name, "1 push, remainingLength=", this.remainingLength, ", buffer=", this.buffer.length);
-			this.push(data);
-			//console.log(this.name, "2a remainingLength=", this.remainingLength, ", buffer=", this.buffer.length);
-			this.buffer=this.buffer.subarray(this.remainingLength);	// Normally clears the buffer
-			this.remainingLength=this.buffer.length;
-			//console.log(this.name, "2b remainingLength=", this.remainingLength, ", buffer=", this.buffer.length);
-		}
-		// Start timeout
-		if (this.remainingLength>0) {
-			this.startTimer('Too much time between two data chunks.');
-			//console.log(this.name, "3a set timer");
-		}
-		// Call callback
-		//console.log(this.name, "3b return, remainingLength=", this.remainingLength, ", buffer=", this.buffer.length);
-		cb();
-	}
-
-
-	_flush(cb) {
-		this.push(this.buffer)
-		this.buffer=Buffer.alloc(0)
-		cb()
-	}
-*/
 }
 

@@ -1,7 +1,7 @@
 import * as tcpPortUsed from 'tcp-port-used';
 import * as SerialPort from 'serialport';
-import {WrapperParser} from './wrapperparser';
 import {UsbSerial} from './usbserial';
+import {DzrpParser} from './dzrpparser';
 
 
 
@@ -97,13 +97,18 @@ export class InterfaceTests {
 						resolve();
 					}, 1000);
 					// Length was removed.
-					// Check data.
+				 	// Check data.
+					let k=0;
 					for (const recByte of data) {
-						lastByteReceived=(lastByteReceived+1)&0xFF;
-						if (recByte!=lastByteReceived) {
-							console.log("Wrong data received after "+bytesReceived+" received bytes");
-							resolve();
-							return;
+						// Skip Seqno
+						k++;
+						if (k>1) {
+							lastByteReceived=(lastByteReceived+1)&0xFF;
+							if (recByte!=lastByteReceived) {
+								console.log("Wrong data received after "+bytesReceived+" received bytes");
+								resolve();
+								return;
+							}
 						}
 					}
 					bytesReceived+=data.length;
@@ -112,10 +117,21 @@ export class InterfaceTests {
 						batchReceived-=batchSize;
 						packetsReceived++;
 						// Send next data
-						const buffer=new Uint8Array(batchSize);
+						const buffer=new Uint8Array(batchSize+4+2);	// +Length+SeqNo+Command
+						let k=0;
+						// Length
+						const length=2+batchSize;
+						buffer[k++]=length&0xFF;
+						buffer[k++]=(length>>>8)&0xFF;
+						buffer[k++]=0;
+						buffer[k++]=0;
+						// SeqNo and command
+						buffer[k++]=1;	
+						buffer[k++]=15;	// CMD_LOOPBACK
+						// Data
 						for (let i=0; i<batchSize; i++) {
 							lastByteSent=(lastByteSent+1)&0xFF;
-							buffer[i]=lastByteSent;
+							buffer[k++]=lastByteSent;
 						}
 						bytesSent+=batchSize;
 						packetsSent++;
@@ -130,7 +146,7 @@ export class InterfaceTests {
 				}, 1000);
 
 				// Open
-				const parser=new WrapperParser({}, 'ZxNext Serial')
+				const parser=new DzrpParser({}, 'DZRP loopback')
 				await serialPort.open(parser);
 				
 				// Success
@@ -150,7 +166,7 @@ export class InterfaceTests {
 				}, time*1000);
 
 				// Send first batch
-				serialPort.emit('data', []);
+				serialPort.emit('data', Buffer.from([]));
 			}
 			catch (e) {
 				clearTimeout(timeout);

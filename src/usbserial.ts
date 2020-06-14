@@ -133,7 +133,7 @@ export class UsbSerial extends EventEmitter {
 	 */
 	public async sendBuffer(buffer: Buffer): Promise<void> {
 		if (this.tmpSendBuffer) {
-			// Cache until drainign is over
+			// Cache until draining is over
 			this.tmpSendBuffer.push(buffer);
 		}
 		else {

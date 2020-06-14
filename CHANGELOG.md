@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.4.0
+Added command line option to do a loopback test with the serial port with dezogif through dzrp.
+
 ## 0.3.0
 Reconnects now after disconnect.
 

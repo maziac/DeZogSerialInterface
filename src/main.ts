@@ -74,7 +74,7 @@ $ cmdsocket -socket 12000
 Starts to listen on port 12000.
 
 General usage:
-cmdsocket -socket port -serial serial_if -baudrate rate [-log] [-test] [-testserial time]
+cmdsocket -socket port -serial serial_if -baudrate rate [-log] [-test] [-testloopback time]
   options:
     -h|-help: Prints this help.
     -v|-version: Prints the version number.
@@ -85,7 +85,7 @@ cmdsocket -socket port -serial serial_if -baudrate rate [-log] [-test] [-testser
     -log: Enables logging to console.
     -test: Use as last argument. If given the program tries to open a 
      socket and a serial connection. Just to see if it could work.
-    -testserial time batch-size: Test the serial connection. The remote side needs to loop back
+    -testloopback time batch-size: Test the serial connection. The remote side needs to loop back
      all received data. time is in secs. batch-size determines teh size of the packets used.
 `);
     }
@@ -148,7 +148,7 @@ cmdsocket -socket port -serial serial_if -baudrate rate [-log] [-test] [-testser
                         this.serialBaudrate=parseInt(baudrateString);
                         break;
 
-                    case '-testserial':
+                    case '-testloopback':
                         const timeString=args.shift();
                         if (timeString==undefined)
                             throw "Missing time argument.";
@@ -157,6 +157,8 @@ cmdsocket -socket port -serial serial_if -baudrate rate [-log] [-test] [-testser
                         if (batchSizeString==undefined)
                             throw "Missing batch-size argument.";
                         const batchSize=parseInt(batchSizeString);
+                        if (batchSize>8192)
+                            throw "Size should be smaller/equal to 8192.";
                         this.checkSerialArguments();
                         await InterfaceTests.testSerialLoopBack(this.serialPort, this.serialBaudrate, time, batchSize);
                         process.exit(0);

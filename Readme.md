@@ -70,3 +70,12 @@ Hints:
 - On macos you can attach your USB/serial device and use ```ls /dev/cu*``` to find out it's name. E.g. /dev/cu.usbserial-AQ007PCD 
 - On Windows the serial port is probably called e.g. "COM1"
 
+
+# Building the Executables
+
+Use:
+
+~~~
+pkg out/main.js -o dezogserialinterface -t node12-linux-x64,node12-macos-x64,node12-win-x64
+~~~
+

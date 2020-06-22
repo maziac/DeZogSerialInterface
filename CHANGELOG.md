@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.5.0
+Serial interface is now open all the time, not closed/re-opened anymore if socket connection closes/re-opens.
+
 ## 0.4.0
 Added command line option to do a loopback test with the serial port with dezogif through dzrp.
 

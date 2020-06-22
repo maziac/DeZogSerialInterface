@@ -66,7 +66,7 @@ export class InterfaceTests {
 		let bytesSent=0;
 		let packetsSent=0;
 		let bytesReceived=0;
-		let packetsReceived=0;
+		let packetsReceived=-1;
 		let batchReceived=batchSize;
 		let lastByteSent=0;
 		let lastByteReceived=lastByteSent;
@@ -78,11 +78,6 @@ export class InterfaceTests {
         return new Promise<void>(async resolve => {
 			try {
 				serialPort=new UsbSerial(serialPortString, serialBaudrate);
-				// Print draining
-				serialPort.on('draining', async () => {
-					// The port is drained before the open event arrives
-					console.log("Draining.");
-				});
 				// Handle errors
 				serialPort.on('error', err => {
 					console.log("Serial interface '"+serialPortString+"' @"+serialBaudrate+" baud\nError: "+err);
@@ -127,7 +122,7 @@ export class InterfaceTests {
 						buffer[k++]=0;
 						// SeqNo and command
 						buffer[k++]=1;	
-						buffer[k++]=15;	// CMD_LOOPBACK
+						buffer[k++]=16;	// CMD_LOOPBACK
 						// Data
 						for (let i=0; i<batchSize; i++) {
 							lastByteSent=(lastByteSent+1)&0xFF;
@@ -148,7 +143,7 @@ export class InterfaceTests {
 				// Open
 				const parser=new DzrpParser({}, 'DZRP loopback')
 				await serialPort.open(parser);
-				
+
 				// Success
 				console.log("Serial interface '"+serialPortString+"' @"+serialBaudrate+" baud.");
 				setTimeout(() => {

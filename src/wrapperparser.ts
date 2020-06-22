@@ -76,6 +76,7 @@ export class WrapperParser extends Transform {
 	 * The chunks received here are typically not bigger than 50-130 bytes.
 	 */
 	_transform(chunk, encoding, cb) {
+		//console.log("Received chunk: "+chunk.length);
 		this.push(chunk);
 		cb();
 	}

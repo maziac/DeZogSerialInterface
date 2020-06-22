@@ -2,6 +2,7 @@ import {SocketSerialPassthrough} from './socketserialpassthrough';
 import {Log} from './log';
 import {UsbSerial} from './usbserial';
 import {InterfaceTests} from './interfacetests';
+import {WrapperParser} from './wrapperparser';
 
 
 
@@ -33,16 +34,35 @@ class Startup {
             // Print parameters
             console.log('Using socket='+this.socketPort+', serial='+this.serialPort+', baudrate='+this.serialBaudrate);
 
+            // Create Serial object
+            const serial=new UsbSerial(this.serialPort, this.serialBaudrate);
+            // Create serial read parser
+            const serialParser=new WrapperParser({}, 'ZxNext Serial');
+            // Setup serial connection
+            serial.once('error', error => {
+                // Close socket connection
+                console.log("Serial. Error on open: "+error);
+                // Terminate
+                process.exit(1);
+            });
+            serial.open(serialParser as any);
+
             const create=() => {
-                // Create Serial object
-                const serial=new UsbSerial(this.serialPort, this.serialBaudrate);
-                // Start socket
+                // Error handling
+                serial.removeAllListeners();
+                serial.on('error', err => {
+                    // Close socket connection
+                    console.log("Serial error: "+err);
+                    // Terminate
+                    process.exit(1);
+                });
+               // Start socket
                 const socket=new SocketSerialPassthrough(this.socketPort, serial);
                 // Reconnect
                 socket.on('disconnect', () => {
                     setTimeout(() => {
                         create();
-                    }, 1000);
+                    }, 1);
                 });
             }
 

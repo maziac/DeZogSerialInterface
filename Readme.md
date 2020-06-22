@@ -53,9 +53,8 @@ Serial interface /dev/cu.usbserial-14610 @921600baud Error:  [Error: Error: No s
 
 Loopback test. The USB/serial device needs to be plugged into a USB port and needs to be connected to the ZX Next (ESP) UART:
 ``` 
-node out/main.js -socket 12000 -serial /dev/cu.usbserial-AQ007PCD  -testloopback 2 200
+node out/main.js -socket 12000 -serial /dev/cu.usbserial-AQ007PCD -testloopback 2 200
 USB-Serial connection opened!
-Draining.
 Serial interface '/dev/cu.usbserial-AQ007PCD' @921600 baud.
 Bytes sent: 19000
 Bytes received: 18894

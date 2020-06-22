@@ -2,7 +2,6 @@ import * as net from 'net';
 import * as assert  from 'assert';
 import {Log} from './log';
 import {UsbSerial} from './usbserial';
-import {WrapperParser} from './wrapperparser';
 import {EventEmitter} from 'events';
 
 
@@ -25,18 +24,9 @@ export class SocketSerialPassthrough extends EventEmitter {
 
 	/// The port of the socket.
 	protected socketPort: number;
-
-	/// The name of the serial port, e.g. "/dev/usbserial" or "COM1".
-	//protected serialPort: string;
-
-	/// The baudrate to use for the serial port.
-	//protected serialBaudrate: number;
 	
 	// The USB serial instance.
 	protected usbSerial: UsbSerial;
-
-	// The read parser for the serial port.
-	protected serialParser: WrapperParser;
 
 
 	/**
@@ -49,24 +39,16 @@ export class SocketSerialPassthrough extends EventEmitter {
 		super();
 		// Store
 		this.socketPort=socketPort;
-		//this.serialPort=serialPort;
-		//this.serialBaudrate=serialBaudrate;
-
-		// Create serial read parser
-		this.serialParser=new WrapperParser({}, 'ZxNext Serial');
 
 		// Setup serial listeners
 		this.usbSerial=serial;
-		this.usbSerial.on('error', err => {
-			// Close socket connection
-			console.log("Serial error: "+err);
-			this.onClose();
-		});
+
 		// Install data handler
 		this.usbSerial.on('data', data => {
 			console.log("Received data from serial.");
 			// Just pass data to the socket.
-			this.socket.write(data);
+			if(this.socket)
+				this.socket.write(data);
 		});
 
 		// Start listening
@@ -121,7 +103,7 @@ export class SocketSerialPassthrough extends EventEmitter {
 			this.onConnect();
 		});
 
-		// Dat received
+		// Data received
 		this.socket.on('data', data => {
 			this.onData(data);
 		});
@@ -165,8 +147,6 @@ export class SocketSerialPassthrough extends EventEmitter {
 	 */
 	protected onConnect() {
 		console.log('Socket connected.');
-		// Setup serial connection
-		this.usbSerial.open(this.serialParser as any);
 	}
 
 
@@ -175,8 +155,8 @@ export class SocketSerialPassthrough extends EventEmitter {
 	 */
 	protected onClose() {
 		console.log('Socket disconnected.');
-		this.usbSerial.removeAllListeners();
-		this.usbSerial.close();
+		//this.usbSerial.removeAllListeners();
+		//this.usbSerial.close();
 		this.socket.removeAllListeners();
 		this.socket=undefined as any;
 		this.emit('disconnect');		
@@ -190,7 +170,7 @@ export class SocketSerialPassthrough extends EventEmitter {
 	protected onData(data) {
 		// Simply pass on to serial
 		this.usbSerial.sendBuffer(data);
-		console.log("Sent data to serial.");
+		console.log("Sent data ("+data.length+" bytes) to serial.");
 	}
 
 }

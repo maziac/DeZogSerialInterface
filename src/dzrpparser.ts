@@ -2,6 +2,10 @@
 const {Transform}=require('stream');
 
 
+// Each sent message has to start with this byte.
+// The ZX Next transmit a lot of zeroes if the joy port is not configured.
+// Therefore this byte is required to recognize when a message starts.
+//const MESSAGE_START_BYTE=0xA5;
 
 
 /**
@@ -96,13 +100,13 @@ export class DzrpParser extends Transform {
 		while (true) {
 			// Check state
 			if (!this.collectingData) {
-				// Check if all 4 bytes have been received
-				if (this.buffer.length<4)
+				// Check if all 5 bytes have been received (starts with MESSAGE_START_BYTE)
+				if (this.buffer.length<5)
 					break;
 				const data=this.buffer;
-				this.remainingLength=data[0]+(data[1]<<8)+(data[2]<<16)+(data[3]*256*65536);	// Note: <<24 might return a negative value
+				this.remainingLength=data[1]+(data[2]<<8)+(data[3]<<16)+(data[4]*256*65536);	// Note: <<24 might return a negative value
 				//console.log(this.name, "0b new message, (remaining)Length=", this.remainingLength);
-				this.buffer=this.buffer.subarray(4);
+				this.buffer=this.buffer.subarray(5);
 				this.collectingData=true;
 			}
 

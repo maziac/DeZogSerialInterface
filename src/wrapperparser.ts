@@ -7,7 +7,7 @@ const {Transform}=require('stream');
 /**
  * This parser does not really parse.
  * It just reads what comes in and passes it through.
- * No CZRP handling.
+ * No DZRP handling.
  */
 export class WrapperParser extends Transform {
 	/// State: Either waiting for length (false) or collecting data (true).

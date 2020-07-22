@@ -45,7 +45,7 @@ export class SocketSerialPassthrough extends EventEmitter {
 
 		// Install data handler
 		this.usbSerial.on('data', data => {
-			console.log("Received data from serial.");
+			console.log("Received "+data.length+" bytes from serial.");
 			// Just pass data to the socket.
 			if(this.socket)
 				this.socket.write(data);

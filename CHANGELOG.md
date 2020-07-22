@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.6.0
+Version on beta test.
+
 ## 0.5.0
 Serial interface is now open all the time, not closed/re-opened anymore if socket connection closes/re-opens.
 

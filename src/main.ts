@@ -17,6 +17,10 @@ class Startup {
     /// The baudrate to use for the serial port.
     protected static serialBaudrate: number = 921600;
 
+    /// Set to true for more verbose output
+    protected static verbose: boolean=false;
+
+
     /**
      * The main program. This is the start point.
      * The command line argument list is evaluated and the socket
@@ -57,7 +61,7 @@ class Startup {
                     process.exit(1);
                 });
                // Start socket
-                const socket=new SocketSerialPassthrough(this.socketPort, serial);
+                const socket=new SocketSerialPassthrough(this.socketPort, serial, this.verbose);
                 // Reconnect
                 socket.on('disconnect', () => {
                     setTimeout(() => {
@@ -98,6 +102,7 @@ DeZogSerialInterface -socket port -serial serial_if -baudrate rate [-log] [-test
   options:
     -h|-help: Prints this help.
     -v|-version: Prints the version number.
+    -verbose: Prints number of sent and received bytes.
     -socket port: The socket port to connect to, default is 12000.
     -serial serial_if: The serial port, e.g. "/dev/usbserial" (Linux/macOS) or "COM1" 
      (Windows).
@@ -140,6 +145,12 @@ DeZogSerialInterface -socket port -serial serial_if -baudrate rate [-log] [-test
                         process.exit(0);
                         break;
 
+                    // Verbose
+                    case '-verbose':
+                        this.verbose=true;
+                        break;
+
+                    // Log
                     case '-log':
                         Log.enabled=true;
                         break;

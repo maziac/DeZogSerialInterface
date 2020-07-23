@@ -28,24 +28,29 @@ export class SocketSerialPassthrough extends EventEmitter {
 	// The USB serial instance.
 	protected usbSerial: UsbSerial;
 
+	/// Set to true for more verbose output
+	protected verbose: boolean;
 
 	/**
 	 * Constructor.
 	 * @param socketPort The port for the socket, e.g. 12000
 	 * @param serialPort The name of the serial port, e.g. "/dev/usbserial" or "COM1".
 	 * @param serialBaudrate The baudrate to use for the serial port, e.g. 230400.
+	 * @param verbose If true, output the nubmer of sent and received bytes.
 	 */
-	constructor(socketPort: number, serial: UsbSerial) {
+	constructor(socketPort: number, serial: UsbSerial, verbose = false) {
 		super();
 		// Store
 		this.socketPort=socketPort;
+		this.verbose=verbose;
 
 		// Setup serial listeners
 		this.usbSerial=serial;
 
 		// Install data handler
 		this.usbSerial.on('data', data => {
-			console.log("Received "+data.length+" bytes from serial.");
+			if(this.verbose)
+				console.log("Received "+data.length+" byte(s) from serial.");
 			// Just pass data to the socket.
 			if(this.socket)
 				this.socket.write(data);
@@ -170,7 +175,8 @@ export class SocketSerialPassthrough extends EventEmitter {
 	protected onData(data) {
 		// Simply pass on to serial
 		this.usbSerial.sendBuffer(data);
-		console.log("Sent data ("+data.length+" bytes) to serial.");
+		if(this.verbose)
+			console.log("Sent "+data.length+" byte(s) to serial.");
 	}
 
 }

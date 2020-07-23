@@ -2,7 +2,8 @@
 
 ## 0.6.1
 - Typos
-- -v now quits after printing the version number.
+- "-v" now quits after printing the version number.
+- "-verbose" option to print the number of sent/received bytes.
 
 ## 0.6.0
 Version on beta test.

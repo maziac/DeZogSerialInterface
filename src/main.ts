@@ -85,16 +85,16 @@ class Startup {
      */
     protected static printHelp() {
         console.log(`
-cdezogserialif is a program that allow DeZog to talk to a ZXNext via a serial interface.
+DeZogSerialInterface is a program that allow DeZog to talk to a ZXNext via a serial interface.
 It opens a serial connection to the ZXNext and on the other side opens a socket listener so that Dezog can connect to the socket.
 
 Example command line:
 
-$ cmdsocket -socket 12000
+$ DeZogSerialInterface -socket 12000
 Starts to listen on port 12000.
 
 General usage:
-cmdsocket -socket port -serial serial_if -baudrate rate [-log] [-test] [-testloopback time]
+DeZogSerialInterface -socket port -serial serial_if -baudrate rate [-log] [-test] [-testloopback time]
   options:
     -h|-help: Prints this help.
     -v|-version: Prints the version number.
@@ -137,6 +137,7 @@ cmdsocket -socket port -serial serial_if -baudrate rate [-log] [-test] [-testloo
                     case '-v':
                         const pckg=require('../package.json');
                         console.log('Version: '+pckg.version);
+                        process.exit(0);
                         break;
 
                     case '-log':

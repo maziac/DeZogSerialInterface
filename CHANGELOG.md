@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.6.1
+- Typos
+- -v now quits after printing the version number.
+
 ## 0.6.0
 Version on beta test.
 

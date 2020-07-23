@@ -78,3 +78,12 @@ Use:
 pkg out/main.js -o dezogserialinterface -t node12-linux-x64,node12-macos-x64,node12-win-x64
 ~~~
 
+
+# Deploying
+
+The package built with pkg does not include native modules, i.e. it misses the serialport module.
+This need to be deployed separately.
+Therefore zip the node_modules/serialport folder and add it to the release.
+This is required for macos, linux and windows.
+I put it in the bin folder.
+<!-- Unfortunately I don't have one for linux.-->

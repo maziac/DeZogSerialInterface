@@ -86,4 +86,5 @@ This need to be deployed separately.
 Therefore zip the node_modules/serialport folder and add it to the release.
 This is required for macos, linux and windows.
 I put it in the bin folder.
-<!-- Unfortunately I don't have one for linux.-->
+The user needs to unzip the node modules zip in the same folder as DeZogSerialInterface.
+<!-- Unfortunately I don't have one for linux. -->

@@ -2,9 +2,8 @@
 node_modules/
 out/
 npm-debug.log
-*.vsix
 logs/
 /data/
 notes.md
 /coverage/
-dezogserialinterface-*
+/dezogserialinterface-*

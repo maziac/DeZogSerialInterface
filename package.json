@@ -1,6 +1,6 @@
 {
   "name": "dezogserialif",
-  "version": "0.6.1",
+  "version": "1.0.0",
   "description": "Program to allow DeZog communicating with a ZX Next through a serial interface.",
   "main": "./out/main.js",
   "scripts": {

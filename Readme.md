@@ -8,7 +8,7 @@ Every message that is received from DeZog is forwarded to the ZX Next and, vice 
 # Installation
 
 Simply download and unzip the [binary](https://github.com/maziac/DeZogSerialInterface/releases) for your operating system to a location of your choice.
-It doesn't use any additional file. 
+It doesn't use any additional file.
 To start it use the terminal/console.
 
 
@@ -17,7 +17,7 @@ To start it use the terminal/console.
 The dezogserialinterface is a commandline program and offers a few options:
 
 - -socket port: If you need to use another socket port than the default 12000 then you can change it here.
-- -serial serial_if: Enter here the name of the serial port. 
+- -serial serial_if: Enter here the name of the serial port.
 - -test: This tests if socket and serial port could be opened and prints a success or error message. Please use this to test if your serial port device can be accessed.
 - -testloopback: Sends data to the serial port and receives data. The dezogif.nex on the ZX Next will return the packets. I.e. this is a standalone test to test communication over UART/serial.
 
@@ -52,7 +52,7 @@ Serial interface /dev/cu.usbserial-14610 @921600baud Error:  [Error: Error: No s
 ```
 
 Loopback test. The USB/serial device needs to be plugged into a USB port and needs to be connected to the ZX Next (ESP) UART:
-``` 
+```
 node out/main.js -socket 12000 -serial /dev/cu.usbserial-AQ007PCD -testloopback 2 200
 USB-Serial connection opened!
 Serial interface '/dev/cu.usbserial-AQ007PCD' @921600 baud.
@@ -66,7 +66,7 @@ Sucessful. No error.
 ```
 
 Hints:
-- On macos you can attach your USB/serial device and use ```ls /dev/cu*``` to find out it's name. E.g. /dev/cu.usbserial-AQ007PCD 
+- On macos you can attach your USB/serial device and use ```ls /dev/cu*``` to find out it's name. E.g. /dev/cu.usbserial-AQ007PCD
 - On Windows the serial port is probably called e.g. "COM1"
 
 
@@ -78,13 +78,24 @@ Use:
 pkg out/main.js -o dezogserialinterface -t node12-linux-x64,node12-macos-x64,node12-win-x64
 ~~~
 
+Or:
+
+Build the executables for all OSes:
+~~~
+make dezogserialif
+~~~
+
+Build all zip files:
+~~~
+make zip
+~~~
+
 
 # Deploying
 
 The package built with pkg does not include native modules, i.e. it misses the serialport module.
 This need to be deployed separately.
-Therefore zip the node_modules/serialport folder and add it to the release.
-This is required for macos, linux and windows.
-I put it in the bin folder.
-The user needs to unzip the node modules zip in the same folder as DeZogSerialInterface.
-<!-- Unfortunately I don't have one for linux. -->
+Therefore the node_modules/serialport folder is added to the created zip files.
+The zip file need to be unzipped and the executable can be started.
+
+Note: Unfortunately I don't have a native serial port bianry for linux. If you are using linux you should build dezogserialinterface by yourself.

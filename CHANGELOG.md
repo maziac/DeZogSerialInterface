@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.0.0
+- Released.
+
 ## 0.6.1
 - Typos
 - "-v" now quits after printing the version number.

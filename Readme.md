@@ -98,4 +98,4 @@ This need to be deployed separately.
 Therefore the node_modules/serialport folder is added to the created zip files.
 The zip file need to be unzipped and the executable can be started.
 
-Note: Unfortunately I don't have a native serial port bianry for linux. If you are using linux you should build dezogserialinterface by yourself.
+Note: Unfortunately I don't have a native serial port binary for linux. If you are using linux you should build dezogserialinterface by yourself.

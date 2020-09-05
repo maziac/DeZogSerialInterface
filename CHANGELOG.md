@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.0.1
+- Updated package.
+
 ## 1.0.0
 - Released.
 

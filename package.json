@@ -1,6 +1,6 @@
 {
   "name": "dezogserialif",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Program to allow DeZog communicating with a ZX Next through a serial interface.",
   "main": "./out/main.js",
   "scripts": {
@@ -13,6 +13,7 @@
   },
   "author": "Thomas Busse",
   "dependencies": {
+    "bl": "^4.0.3",
     "serialport": "^9.0.0",
     "source-map-support": "^0.5.19",
     "tcp-port-used": "^1.0.1",

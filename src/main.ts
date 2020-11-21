@@ -104,14 +104,14 @@ DeZogSerialInterface -socket port -serial serial_if -baudrate rate [-log] [-test
     -v|-version: Prints the version number.
     -verbose: Prints number of sent and received bytes.
     -socket port: The socket port to connect to, default is 12000.
-    -serial serial_if: The serial port, e.g. "/dev/usbserial" (Linux/macOS) or "COM1" 
+    -serial serial_if: The serial port, e.g. "/dev/usbserial" (Linux/macOS) or "COM1"
      (Windows).
     -baudrate rate: The baudrate to use for the serial port. Default=230400.
     -log: Enables logging to console.
-    -test: Use as last argument. If given the program tries to open a 
+    -test: Use as last argument. If given the program tries to open a
      socket and a serial connection. Just to see if it could work.
     -testloopback time batch-size: Test the serial connection. The remote side needs to loop back
-     all received data. time is in secs. batch-size determines teh size of the packets used.
+     all received data. time is in secs. batch-size determines the size of the packets used.
 `);
     }
 
@@ -195,7 +195,7 @@ DeZogSerialInterface -socket port -serial serial_if -baudrate rate [-log] [-test
                         await InterfaceTests.testSerialLoopBack(this.serialPort, this.serialBaudrate, time, batchSize);
                         process.exit(0);
                         break;
-                    
+
                     case '-test':
                         this.checkSocketArguments();
                         this.checkSerialArguments();
@@ -203,7 +203,7 @@ DeZogSerialInterface -socket port -serial serial_if -baudrate rate [-log] [-test
                         await InterfaceTests.testSerial(this.serialPort, this.serialBaudrate);
                         process.exit(0);
                         break;
-                    
+
                     default:
                         throw "Unknown argument: '"+arg+"'";
                 }
@@ -217,7 +217,7 @@ DeZogSerialInterface -socket port -serial serial_if -baudrate rate [-log] [-test
         // Check if any argument given
         //if (argCount==0)
         //    throw "No arguments. Use 'dezogserialif -h' to show all options."
-        
+
         this.checkSocketArguments();
         this.checkSerialArguments();
     }

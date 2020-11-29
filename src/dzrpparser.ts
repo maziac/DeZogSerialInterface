@@ -9,8 +9,11 @@ const {Transform}=require('stream');
 
 
 /**
- * This parser reads the first 4 bytes and interprets it as (little endian) length.
+ * This parser reads the first 1+4 bytes.
+ * [0] = Message start byte 0xA5.
+ * [1-4] = The (little endian) length.
  * Then it collects 'length' further bytes.
+ * The first of these bytes is the seq_no [5] which is part of the data already.
  * When all bytes have been received the data is emitted.
  * This is the basic DZRP format.
  * Is used here only for loopback testing.
@@ -100,11 +103,11 @@ export class DzrpParser extends Transform {
 		while (true) {
 			// Check state
 			if (!this.collectingData) {
-				// Check if all 5 bytes have been received (starts with MESSAGE_START_BYTE)
-				if (this.buffer.length<5)
+				// Check if all 5 bytes have been received (starts with MESSAGE_START_BYTE) and length
+				if (this.buffer.length<1+4)
 					break;
 				const data=this.buffer;
-				this.remainingLength=data[1]+(data[2]<<8)+(data[3]<<16)+(data[4]*256*65536);	// Note: <<24 might return a negative value
+				this.remainingLength = data[1] + (data[2] << 8) + (data[3] << 16) + (data[4] * 256 * 65536);	// Note: <<24 might return a negative value
 				//console.log(this.name, "0b new message, (remaining)Length=", this.remainingLength);
 				this.buffer=this.buffer.subarray(5);
 				this.collectingData=true;

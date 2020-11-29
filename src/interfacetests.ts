@@ -91,7 +91,7 @@ export class InterfaceTests {
 						console.log("Timeout. No data received.");
 						resolve();
 					}, 1000);
-					// Length was removed.
+					// Length and seq_no was removed.
 				 	// Check data.
 					let k=0;
 					for (const recByte of data) {
@@ -115,13 +115,14 @@ export class InterfaceTests {
 						const buffer=new Uint8Array(batchSize+4+2);	// +Length+SeqNo+Command
 						let k=0;
 						// Length
-						const length=2+batchSize;
+						//const length = 2 + batchSize;
+						const length = batchSize;
 						buffer[k++]=length&0xFF;
 						buffer[k++]=(length>>>8)&0xFF;
 						buffer[k++]=0;
 						buffer[k++]=0;
 						// SeqNo and command
-						buffer[k++]=1;	
+						buffer[k++]=1;
 						buffer[k++]=16;	// CMD_LOOPBACK
 						// Data
 						for (let i=0; i<batchSize; i++) {

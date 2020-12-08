@@ -123,7 +123,7 @@ export class InterfaceTests {
 						buffer[k++]=0;
 						// SeqNo and command
 						buffer[k++]=1;
-						buffer[k++]=16;	// CMD_LOOPBACK
+						buffer[k++]=15;	// CMD_LOOPBACK
 						// Data
 						for (let i=0; i<batchSize; i++) {
 							lastByteSent=(lastByteSent+1)&0xFF;

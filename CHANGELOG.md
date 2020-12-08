@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.1.1
+- Fixed loopback mode.
+
 ## 1.1.0
 - Fix: length of transmitted bytes fixed.
 

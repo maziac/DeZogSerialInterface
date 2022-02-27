@@ -1,5 +1,5 @@
 import * as tcpPortUsed from 'tcp-port-used';
-import * as SerialPort from 'serialport';
+import {SerialPort} from 'serialport';
 import {UsbSerial} from './usbserial';
 import {DzrpParser} from './dzrpparser';
 
@@ -32,8 +32,10 @@ export class InterfaceTests {
         // Serial interface
         return new Promise<void>(resolve => {
             try {
-				const serialPort=new SerialPort(serialPortString, {
-                    baudRate: serialBaudrate, autoOpen: false
+				const serialPort = new SerialPort({
+					path: serialPortString,
+					baudRate: serialBaudrate,
+					autoOpen: false
                 });
                 // React on-open
                 serialPort.on('open', async () => {

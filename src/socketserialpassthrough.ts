@@ -24,7 +24,7 @@ export class SocketSerialPassthrough extends EventEmitter {
 
 	/// The port of the socket.
 	protected socketPort: number;
-	
+
 	// The USB serial instance.
 	protected usbSerial: UsbSerial;
 
@@ -50,7 +50,16 @@ export class SocketSerialPassthrough extends EventEmitter {
 		// Install data handler
 		this.usbSerial.on('data', data => {
 			if(this.verbose)
-				console.log("Received "+data.length+" byte(s) from serial.");
+				console.log("Received " + data.length + " byte(s) from serial.");
+			// Log data
+			/*
+			for (const dat of data) {
+				if (dat == 0xA5)
+					console.log('0x' + dat.toString(16));	// Newline
+				else
+					console.log('  0x' + dat.toString(16));
+			}
+			*/
 			// Just pass data to the socket.
 			if(this.socket)
 				this.socket.write(data);
@@ -164,7 +173,7 @@ export class SocketSerialPassthrough extends EventEmitter {
 		//this.usbSerial.close();
 		this.socket.removeAllListeners();
 		this.socket=undefined as any;
-		this.emit('disconnect');		
+		this.emit('disconnect');
 	}
 
 

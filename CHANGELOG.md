@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.2.0
+- Update to serialport 10.3.0.
+- Functionality-wise: no change.
+
 ## 1.1.1
 - Fixed loopback mode.
 

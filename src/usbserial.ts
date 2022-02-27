@@ -1,4 +1,4 @@
-import * as SerialPort from 'serialport';
+import {SerialPort} from 'serialport';
 import * as Transform from 'stream';
 import {EventEmitter} from 'events';
 
@@ -37,12 +37,14 @@ export class UsbSerial extends EventEmitter {
 	public async open(parser: Transform): Promise<void> {
 		return new Promise<void>((resolve, reject) => {
 			// Open the serial port
-			this.serialPort=new SerialPort(this.serialPort /*"/dev/cu.usbserial-14610"*/, {
-				baudRate: this.serialBaudrate /*115200*/, autoOpen: false
+			this.serialPort = new SerialPort({
+				path: this.serialPort,
+				baudRate: this.serialBaudrate,
+				autoOpen: false
 			});
 
 			// Create parser
-			this.serialPort.pipe(parser); 
+			this.serialPort.pipe(parser);
 
 			// React on-open
 			this.serialPort.once('open', async () => {
@@ -55,7 +57,7 @@ export class UsbSerial extends EventEmitter {
 					this.emit('error', err);
 				});
 				// Handle parser errors
-				parser.on('error', err => {
+				parser.on('error', err => {// NOSONAR
 					console.log('Error: ', err);
 					// Error
 					this.emit('error', err);

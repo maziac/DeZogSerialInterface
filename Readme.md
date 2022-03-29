@@ -1,3 +1,12 @@
+**IMPORTANT NOTE:**
+Before version 2.6.0 the DeZogSerialInterface was necessary to connect DeZog to a ZX Next.
+Beginning with DeZog v2.6.0 this functionality is integrated into DeZog.
+I.e. there is no need to use the DeZogSerialInterface anymore.
+
+There is only one feature that might still be useful which is the 'loopback'.
+This works standalone, i.e. without DeZog one can test that the serial cable connection is working reliable.
+
+
 # DeZog Serial Interface
 
 A socket-serial interface to connect [DeZog](https://github.com/maziac/DeZog) with a [ZX Next](https://www.specnext.com).
